@@ -9,6 +9,8 @@ import org.springframework.stereotype.Component;
 import com.Applazoic.movies.Constants.MovieConstants;
 import com.Applazoic.movies.Dto.MovieDates;
 import com.Applazoic.movies.Dto.MovieEntry;
+import com.Applazoic.movies.Exceptions.InvalidRequestFormat;
+import com.Applazoic.movies.Exceptions.MovieAlreadyPresent;
 import com.Applazoic.movies.Service.MovieService;
 
 @Component
@@ -124,6 +126,7 @@ public class Movies implements MovieService {
 
 			if (movies.containsKey(movieName)) {
 				revertAllChanges(i);
+				throw new MovieAlreadyPresent(MovieConstants.MOVIE_ALREADY_PRESENT_ERROR);
 			}
 
 			if ((hashStartDate != null && hashEndDate != null) && !isEndDateLessThanStart(hashStartDate, hashEndDate)) {
@@ -131,6 +134,7 @@ public class Movies implements MovieService {
 				moviesVector.add(new MovieEntry(movieName, hashStartDate, hashEndDate));
 			} else {
 				revertAllChanges(i);
+				throw new InvalidRequestFormat(MovieConstants.INVALID_DATE_FORMAT_ERROR, movieName);
 			}
 
 		}
