@@ -6,4 +6,8 @@ public class InvalidRequestFormat extends RuntimeException {
 		super(message + " for " + movieName);
 	}
 
+	public InvalidRequestFormat(String message) {
+		super(message);
+	}
+
 }

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import com.Applazoic.movies.Constants.MovieConstants;
 import com.Applazoic.movies.Dto.MovieDates;
 import com.Applazoic.movies.Dto.MovieEntry;
+import com.Applazoic.movies.Dto.OutputMovieSchedule;
 import com.Applazoic.movies.Exceptions.InvalidRequestFormat;
 import com.Applazoic.movies.Exceptions.MovieAlreadyPresent;
 import com.Applazoic.movies.Service.MovieService;
@@ -38,23 +39,33 @@ public class Movies implements MovieService {
 	// This method calculates the hash on basis of month and date.The hash
 	// calculated is such that
 	// for 28 Jan the hash becomes 0128 i.e Month concatenated with date.
-	private String calculateHash(String[] splitDate) {
+	private String calculateHash(String date, String movieName) {
 
-		if (splitDate.length != 2) {
-			// Any date can't have more than one space
-			return null;
-		}
-		String date = splitDate[0].length() < 2 ? "0" + splitDate[0] : splitDate[0];
-		String monthInNum = calcMonth(splitDate[1]);
-		if (monthInNum == null) {
-			return null;
-		}
-		if (IsdateInValid(date, monthInNum)) {
-			return null;
-		}
-		String hashDate = monthInNum + date;
-		return hashDate;
+		if (areAllParametersPresentInRequest(date, movieName)) {
 
+			if (movieName.length() != 0) {
+				String[] splitDate = date.trim().split(MovieConstants.SpaceChar);
+
+				if (splitDate.length == 2) {
+					// Any date can't have more than one space
+					String dateVal = splitDate[0].length() < 2 ? "0" + splitDate[0] : splitDate[0];
+					String monthInNum = calcMonth(splitDate[1]);
+
+					if (monthInNum != null && !IsdateInValid(dateVal, monthInNum)) {
+						String hashDate = monthInNum + dateVal;
+						return hashDate;
+					}
+				}
+				throw new InvalidRequestFormat(MovieConstants.INVALID_DATE_FORMAT_ERROR, movieName);
+			}
+			throw new InvalidRequestFormat(MovieConstants.MOVIE_NAME_CANT_BE_EMPTY);
+		}
+		throw new InvalidRequestFormat(MovieConstants.PARAMETER_KEY_NOT_APPROPRIAITE);
+
+	}
+
+	private boolean areAllParametersPresentInRequest(String date, String movieName) {
+		return date != null && (movieName != null);
 	}
 
 	private boolean IsdateInValid(String date, String monthInNum) {
@@ -119,22 +130,21 @@ public class Movies implements MovieService {
 			String startDate = movieEntry[i].getStartDate();
 			String endDate = movieEntry[i].getEndDate();
 
-			String[] splitStartDate = startDate.trim().split(MovieConstants.SpaceChar);
-			String[] splitEndDate = endDate.trim().split(MovieConstants.SpaceChar);
-			String hashStartDate = calculateHash(splitStartDate);
-			String hashEndDate = calculateHash(splitEndDate);
+			String hashStartDate = calculateHash(startDate, movieName);
+			String hashEndDate = calculateHash(endDate, movieName);
 
 			if (movies.containsKey(movieName)) {
 				revertAllChanges(i);
 				throw new MovieAlreadyPresent(MovieConstants.MOVIE_ALREADY_PRESENT_ERROR);
 			}
 
-			if ((hashStartDate != null && hashEndDate != null) && !isEndDateLessThanStart(hashStartDate, hashEndDate)) {
+			if (areAllParametersPresentInRequest(hashStartDate, hashEndDate)
+					&& !isEndDateLessThanStart(hashStartDate, hashEndDate)) {
 				movies.put(movieName, new MovieDates(startDate, endDate));
 				moviesVector.add(new MovieEntry(movieName, hashStartDate, hashEndDate));
 			} else {
 				revertAllChanges(i);
-				throw new InvalidRequestFormat(MovieConstants.INVALID_DATE_FORMAT_ERROR, movieName);
+				throw new InvalidRequestFormat(MovieConstants.END_DATE_LESS_THAN_START_DATE, movieName);
 			}
 
 		}
@@ -153,10 +163,10 @@ public class Movies implements MovieService {
 	}
 
 	@Override
-	public ArrayList<MovieEntry> showMovies() {
+	public OutputMovieSchedule showMovies() {
 		ArrayList<MovieEntry> moviesDetails = new ArrayList<MovieEntry>();
 		moviesDetails = findMoviesToDo(moviesVector);
-		return moviesDetails;
+		return new OutputMovieSchedule(moviesDetails.size(), moviesDetails);
 	}
 
 }

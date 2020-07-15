@@ -1,13 +1,12 @@
 package com.Applazoic.movies.Service;
 
-import java.util.ArrayList;
-
 import com.Applazoic.movies.Dto.MovieEntry;
+import com.Applazoic.movies.Dto.OutputMovieSchedule;
 
 public interface MovieService {
 
 	public String addMovieData(MovieEntry[] movieEntry);
 
-	public ArrayList<MovieEntry> showMovies();
+	public OutputMovieSchedule showMovies();
 
 }

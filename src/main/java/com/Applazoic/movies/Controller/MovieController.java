@@ -1,7 +1,5 @@
 package com.Applazoic.movies.Controller;
 
-import java.util.ArrayList;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -10,6 +8,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.Applazoic.movies.Dto.MovieEntry;
+import com.Applazoic.movies.Dto.OutputMovieSchedule;
 import com.Applazoic.movies.Service.MovieService;
 
 @RestController
@@ -35,7 +34,8 @@ public class MovieController {
 	}
 
 	@GetMapping("/showmovieschedule")
-	public ArrayList<MovieEntry> showMovies() {
+	public OutputMovieSchedule showMovies() {
+
 		return movieService.showMovies();
 	}
 
