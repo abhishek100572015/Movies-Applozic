@@ -17,11 +17,6 @@ public class MovieController {
 	@Autowired
 	MovieService movieService;
 
-	@GetMapping("/test")
-	public String test() {
-		return "Abhishek";
-	}
-
 	@PostMapping("/addmovie")
 	@ResponseBody
 	public String addMovieData(@RequestBody MovieEntry[] movieEntry) {
