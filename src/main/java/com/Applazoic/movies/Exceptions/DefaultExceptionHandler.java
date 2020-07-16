@@ -29,8 +29,9 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
 
 		String detailsAboutCorrectFormat;
 		System.out.println(ex.getMessage());
-
-		if (ex.getMessage().startsWith(MovieConstants.PARAMETER_KEY_NOT_APPROPRIAITE)) {
+		if (ex.getMessage().startsWith(MovieConstants.MOVIE_NAME_CANT_BE_EMPTY)) {
+			detailsAboutCorrectFormat = request.getDescription(false) + " " + MovieConstants.MOVIE_NAME_CANT_BE_EMPTY;
+		} else if (ex.getMessage().startsWith(MovieConstants.PARAMETER_KEY_NOT_APPROPRIAITE)) {
 
 			detailsAboutCorrectFormat = request.getDescription(false)
 					+ "   The parameters are movieName,startdate and EndDate";
@@ -41,6 +42,7 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
 
 		ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), ex.getMessage(),
 				detailsAboutCorrectFormat);
+
 		return new ResponseEntity(exceptionResponse, HttpStatus.BAD_REQUEST);
 	}
 

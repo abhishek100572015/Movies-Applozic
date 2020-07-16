@@ -43,7 +43,7 @@ public class Movies implements MovieService {
 
 		if (areAllParametersPresentInRequest(date, movieName)) {
 
-			if (movieName.length() != 0) {
+			if (movieName.trim().length() != 0) {
 				String[] splitDate = date.trim().split(MovieConstants.SpaceChar);
 
 				if (splitDate.length == 2) {
